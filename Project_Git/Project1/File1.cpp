@@ -4,93 +4,34 @@
 #define CRT_SECURE_NO_WARNINGS
 using namespace std;
 
-
-void task1(char* arr, char* word)
+struct Temperature
 {
-    int count = 0;
-    int length = strlen(arr);
-    int wordLength = strlen(word);
-
-    for (int i = 0; i <= length - wordLength; ++i) {
-        bool found = true;
-        for (int j = 0; j < wordLength; ++j) {
-            if (arr[i + j] != word[j]) {
-                found = false;
-                break;
-            }
-        }
-        // Додаткова перевірка, щоб знайдене слово не було фрагментом більшого слова
-        if (found && (i == 0 || arr[i - 1] == ' ') &&
-            (i + wordLength == length || arr[i + wordLength] == ' ' || arr[i + wordLength] == '!' || arr[i + wordLength] == '?')) {
-            ++count;
-        }
-    }
-
-    cout << "Слово \"" << word << "\" зустрічається " << count << " разів." << endl;
-}
-void task2(char* arr, int size)
+    float high;
+    float low;
+    float freeze;
+};
+struct Machine
 {
-    cout << "зайнято: " << strlen(arr) + 1 << "\nвільно: " << size - (strlen(arr) + 1) << "\nусього: " << size << endl;
-}
-void task3(char*& arr, char* pattern)
-{
-    int length = strlen(arr);
-    int plength = strlen(pattern);
-    int count = 0;
-    bool Isthere = false;
-    for (int i = 0; i < length; i++)
-    {
-        for (int j = 0; j < plength; j++)
-        {
-            if (arr[i] == pattern[j])
-            {
-                count++;
-                break;
-            }
-        }
-    }
-    char* new_str = new char[length - count + 1];
-    count = 0;
-    for (int i = 0; i < length; i++)
-    {
-        Isthere = false;
-        for (int j = 0; j < plength; j++)
-        {
-            if (arr[i] == pattern[j])
-            {
-                Isthere = true;
-                break;
-            }
-        }
-        if (!Isthere)
-            new_str[count++] = arr[i];
+    char Brand[100];
+    char color[100];
+    int width;
+    int length;
+    int height;
+    int power;
+    int speed_of_work;
+    Temperature temperature;
 
-    }
-    delete[] arr;
-    new_str[count] = '\0';
-    arr = new_str;
 
-}
+};
 
 int main()
 {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
-    const int Max_SIZE = 100;
-    char str[Max_SIZE], word[Max_SIZE], str2[Max_SIZE], pattern[Max_SIZE];
-    char* str3 = new char[Max_SIZE];
-    //task 1
-    cin.getline(str, Max_SIZE);
-    cin.getline(word, Max_SIZE);
-    task1(str, word);
-    //task 2
-    cin.getline(str2, Max_SIZE);
-    task2(str2, Max_SIZE);
-    //task 3
-    cin.getline(str3, Max_SIZE);
-    cin.getline(pattern, Max_SIZE);
-    task3(str3, pattern);
-    cout << str3 << endl;
-    delete[] str3;
+    Machine object1;
+    cin >> object1.Brand >> object1.color >> object1.width >> object1.height >> object1.length >> object1.power >> object1.speed_of_work;
+    cin >> object1.temperature.high >> object1.temperature.low >> object1.temperature.freeze;
+    cout <<"1-Brand\n2-color\n3-width\n4-height\n5-length\n6-power\n7-speed_of_work\n"<< object1.Brand <<endl<< object1.color <<endl<< object1.width <<"meters"<<endl << object1.height << "meters" << endl << object1.length << "meters" << endl << object1.power <<"kW" << endl << object1.speed_of_work<<"rps"<<endl;
+    cout<<"temperature:1-high\n2-low\n3-freeze\n"<< object1.temperature.high <<"*C"<<endl<< object1.temperature.low << "*C" << endl << object1.temperature.freeze << "*C" << endl;
     return 0;
 }
