@@ -1,134 +1,126 @@
-﻿#include<iostream>
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
 #include<Windows.h>
 #include<String.h>
-#define CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
 using namespace std;
-
-struct Temperature
+void task2(FILE* f, int N)
 {
-	float high;
-	float low;
-	float freeze;
-};
-struct Machine
-{
-	char Brand[100];
-	char color[100];
-	int width;
-	int length;
-	int height;
-	int power;
-	int speed_of_work;
-
-	Temperature temperature;
-
-
-};
-struct Machine2
-{
-	char Brand[100];
-	char color[100];
-	int power;
-	int Water_VAPOUR; //1-yes or 0-no
-	Temperature temperature;
-};
-struct Machine3
-{
-	char Brand[100];
-	char color[100];
-	int power;
-	int V; //одиниці вимірювання-м³
-	Temperature temperature;
-};
-struct Animal
-{
-	char kind[200];
-	char Class[200];
-	char Name[100];
-	void Signal()
+	char line[1000];
+	char long_line[1000] = "";
+	while (fgets(line, N, f))
 	{
-		if (strcmp(Class, "Dog") == 0)
-		{
-			cout << "How-How-How" << endl;
-		}
-		else if (strcmp(Class, "Cat") == 0)
-		{
-			cout << "Meow-Meow-Meow" << endl;
-		}
-		else if (strcmp(Class, "Cow") == 0)
-		{
-			cout << "Muuuuu-Muuuu" << endl;
-		}
-		else if (strcmp(Class, "Snake") == 0)
-		{
-			cout << "Ssssssss-sssssss" << endl;
-		}
-		else if (strcmp(Class, "Parrot") == 0)
-		{
-			cout << "cqwick-cqwick" << endl;
-		}
-		else if (strcmp(Class, "Wolf") == 0)
-		{
-			cout << "Wouuuuuuuu" << endl;
-		}
-		else if (strcmp(Class, "") == 0)
-		{
-			cout << "you didn't enter the class of your animal!!" << endl;
-		}
-		else
-		{
-			cout << "your animal can't signal!" << endl;
+		if (strlen(line) > strlen(long_line)) {
+			strcpy(long_line, line);
 		}
 	}
-	void InitPet()
-	{
-		cout << "enter the Latin name of your animal species(for example:Chamaeleonidae):" << endl;
-		cin >> kind;
-		cout << "Enter the class of your animal(for example:Wolf,Dog,Cat,Cow,Snake,Parrot):" << endl;
-		cin >> Class;
-		cout << "Enter the name of your animal(for example Phillip):" << endl;
-		cin >> Name;
+	printf("Найдовший рядок: %s\n", long_line);
+	printf("Довжина найдовшого рядка: %i\n", strlen(long_line));
+
+}
+void task1(FILE* f, FILE* f2, int N)
+{
+	char line[1000];
+	char last_line[1000] = "";
+
+	while (fgets(line, N, f)) {
+		strcpy(last_line, line);
 	}
-	void SeeParameters()
-	{
-		cout << "kind: " << kind << endl;
-		cout << "Class: " << Class << endl;
-		cout << "Name: " << Name << endl;
+
+
+	rewind(f); // Повертаємо позицію вказівника файла на початок
+	while (fgets(line, N, f)) {
+		if (strcmp(line, last_line) != 0) {
+			fputs(line, f2);
+		}
 	}
-};
+	printf("Останній рядок видалено та результат записано в file2.txt.\n");
+
+}
+void task3(FILE*& f, int N, char tword[])
+{
+	int count = 0;
+	char line[1000];
+	char* select_word;
+	while (fgets(line, N, f))
+	{
+		select_word = strtok(line, "\t ");
+		while (select_word != NULL)
+		{
+			if (strcmp(select_word, tword) == 0) {
+				count++;
+			}
+			select_word = strtok(NULL, " \t\n");
+		}
+	}
+	printf("count:%i\n", count);
+
+}
+void task4(FILE*& f,char file_path[],const int N, char find_word[], char new_word[])
+{
+	
+	char temp_file_path[1000]; // шлях для створення тимчасового файлу temp_file.txt(бажано щоб розташовувався там де й file3)
+	cin.getline(temp_file_path, N);
+	FILE* f2 = fopen(temp_file_path, "w");
+	char line[1000];
+	while (fgets(line, N, f)) {
+		char* token = strtok(line, " ");
+		while (token != NULL) {
+			if (strcmp(token, find_word) == 0) {
+				fputs(new_word, f2);
+				fputs(" ", f2);
+			}
+			else {
+				fputs(token, f2);
+				fputs(" ", f2);
+			}
+			token = strtok(NULL, " ");
+		}
+	}
+	fclose(f);
+	fclose(f2);
+	f = fopen(file_path, "w");  
+	f2 = fopen(temp_file_path, "r");
+	while (fgets(line, N, f2)) {
+		fputs(line, f);
+		fputs("\n", f);
+	}
+	fclose(f);
+	fclose(f2);
+	remove(temp_file_path);
+	printf("Операція успішно виконана!\n");
+
+
+
+}
 int main()
 {
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
-	//завдання 1
-	Machine object1;
-	cin >> object1.Brand >> object1.color >> object1.width >> object1.height >> object1.length >> object1.power;
-	cin >> object1.speed_of_work;
-	cin >> object1.temperature.high >> object1.temperature.low >> object1.temperature.freeze;
+	const int N = 1000;
+	char file1_path[N], file2_path[N], file3_path[N];
+	cin.getline(file1_path, N); //введіть шлях до file1
+	cin.getline(file2_path, N);//введіть шлях до file2
+	cin.getline(file3_path, N);//введіть шлях до file3
+	FILE* f = fopen(file1_path, "r");
+	FILE* f2 = fopen(file2_path, "w");
+	FILE* f3 = fopen(file3_path, "r");
+	
+	char inputword[1000];
+	char find_word[1000];
+	char new_word[1000];
 
-	cout << "1-Brand\n2-color\n3-width\n4-height\n5-length\n6-power\n7-speed_of_work\n" << object1.Brand << endl << object1.color << endl << object1.width << "meters" << endl << object1.height << "meters" << endl << object1.length << "meters" << endl << object1.power << "kW" << endl << object1.speed_of_work << "rps" << endl;
+	cin.getline(inputword, 1000);
+	task1(f, f2, N);
+	rewind(f);
 
-	cout << "temperature:1-high\n2-low\n3-freeze\n" << object1.temperature.high << "*C" << endl << object1.temperature.low << "*C" << endl << object1.temperature.freeze << "*C" << endl;
-	//завдання 2
-	Machine2 object2;
-	cin >> object2.Brand >> object2.color >> object2.power >> object2.Water_VAPOUR >> object2.temperature.freeze >> object2.temperature.low >> object2.temperature.high;
-	cout << "1-Brand\n2-color\n3-power\n4-Water vapour\n5-freeze temperature\n6-low temperature\n7-high temperature\n" << object2.Brand << endl << object2.color << endl << object2.power << "kW" << endl;
-	if (object2.Water_VAPOUR)
-		cout << "Yes" << endl;
-	else
-		cout << "No" << endl;
-	cout << object2.temperature.freeze << endl << object2.temperature.low << endl << object2.temperature.high << endl;
-	//завдання 3
-	Machine3 object3;
-	cin >> object3.Brand >> object3.color >> object3.power >> object3.V >> object3.temperature.freeze >> object3.temperature.low >> object3.temperature.high;
-	cout << "1-Brand\n2-color\n3-power\n4-volume\n5-freeze temperature\n6-low temperature\n7-high temperature\n" << object3.Brand << endl << object3.color << endl << object3.power << "kW" << endl;
-	cout << object3.V << "M^3" << endl;
-	cout << object3.temperature.freeze << endl << object3.temperature.low << endl << object3.temperature.high << endl;
-	//завдання 4
-	Animal MyPet;
-	MyPet.InitPet();
-	MyPet.SeeParameters();
-	MyPet.Signal();
-
+	task2(f, N);
+	rewind(f);
+	task3(f, N, inputword);
+	fclose(f);
+	fclose(f2);
+	cin.getline(find_word, N);
+	cin.getline(new_word, N);
+	task4(f3, file3_path, N, find_word, new_word);
 	return 0;
 }
