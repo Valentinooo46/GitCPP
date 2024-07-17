@@ -4,123 +4,194 @@
 #include<String.h>
 #include <stdio.h>
 using namespace std;
-void task2(FILE* f, int N)
-{
-	char line[1000];
-	char long_line[1000] = "";
-	while (fgets(line, N, f))
-	{
-		if (strlen(line) > strlen(long_line)) {
-			strcpy(long_line, line);
-		}
-	}
-	printf("Найдовший рядок: %s\n", long_line);
-	printf("Довжина найдовшого рядка: %i\n", strlen(long_line));
+struct contact {
+	char* name = new char[100];
+	char fax[14];
+	void fill() {
+		char temp_name[200];
+		char temp_fax[50];
 
-}
-void task1(FILE* f, FILE* f2, int N)
-{
-	char line[1000];
-	char last_line[1000] = "";
-
-	while (fgets(line, N, f)) {
-		strcpy(last_line, line);
-	}
-
-
-	rewind(f); // Повертаємо позицію вказівника файла на початок
-	while (fgets(line, N, f)) {
-		if (strcmp(line, last_line) != 0) {
-			fputs(line, f2);
-		}
-	}
-	printf("Останній рядок видалено та результат записано в file2.txt.\n");
-
-}
-void task3(FILE*& f, int N, char tword[])
-{
-	int count = 0;
-	char line[1000];
-	char* select_word;
-	while (fgets(line, N, f))
-	{
-		select_word = strtok(line, "\t ");
-		while (select_word != NULL)
+		cout << "Введіть ім'я: ";
+		bool Isvalid = false;
+		do
 		{
-			if (strcmp(select_word, tword) == 0) {
-				count++;
-			}
-			select_word = strtok(NULL, " \t\n");
-		}
-	}
-	printf("count:%i\n", count);
+			cin.getline(temp_name, 200);
 
+			// Перевірка довжини імені
+			if (strlen(temp_name) >= 100) {
+				cout << "Ім'я занадто довге. Введіть коректне ім'я (не більше 100 символів).\n";
+				Isvalid = false;
+			}
+			else
+			{
+				Isvalid = true;
+			}
+		} while (!Isvalid);
+
+
+		cout << "Введіть номер факсу: ";
+		Isvalid = false;
+		do
+		{
+			cin.getline(temp_fax, 50);
+
+			// Перевірка довжини номера факсу
+			if (strlen(temp_fax) > 14) {
+				cout << "Номер телефону занадто довгий. Введіть коректний номер (не більше 14 символів).\n";
+				Isvalid = false;
+			}
+			else
+			{
+				Isvalid = true;
+			}
+		} while (!Isvalid);
+
+
+		// Копіюємо дані до полів екземпляру структури
+		strcpy(name, temp_name);
+		strcpy(fax, temp_fax);
+	}
+	void read_info()
+	{
+		printf("%s %s\n", name, fax);
+	}
+};
+void new_contact(contact*& list, int& count) {
+	contact* new_list = new contact[count + 1];
+	if (list != nullptr)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			new_list[i] = list[i];
+		}
+		delete[] list;
+	}
+
+	list = new_list;
+	list[count].fill();
+	count++;
 }
-void task4(FILE*& f,char file_path[],const int N, char find_word[], char new_word[])
+void sort_name(contact*& list, int count)
 {
-	
-	char temp_file_path[1000]; // шлях для створення тимчасового файлу temp_file.txt(бажано щоб розташовувався там де й file3)
-	cin.getline(temp_file_path, N);
-	FILE* f2 = fopen(temp_file_path, "w");
-	char line[1000];
-	while (fgets(line, N, f)) {
-		char* token = strtok(line, " ");
-		while (token != NULL) {
-			if (strcmp(token, find_word) == 0) {
-				fputs(new_word, f2);
-				fputs(" ", f2);
+	contact temp;
+	for (int i = 0; i < count; i++)
+	{
+		for (int j = 0; j < count - 1; j++)
+		{
+			if (strcmp(list[j].name, list[j + 1].name) > 0)
+			{
+				temp = list[j];
+				list[j] = list[j + 1];
+				list[j + 1] = temp;
 			}
-			else {
-				fputs(token, f2);
-				fputs(" ", f2);
-			}
-			token = strtok(NULL, " ");
 		}
 	}
-	fclose(f);
-	fclose(f2);
-	f = fopen(file_path, "w");  
-	f2 = fopen(temp_file_path, "r");
-	while (fgets(line, N, f2)) {
-		fputs(line, f);
-		fputs("\n", f);
+}
+void sort_fax(contact*& list, int count)
+{
+	contact temp;
+	for (int i = 0; i < count; i++)
+	{
+		for (int j = 0; j < count - 1; j++)
+		{
+			if (strcmp(list[j].fax, list[j + 1].fax) > 0)
+			{
+				temp = list[j];
+				list[j] = list[j + 1];
+				list[j + 1] = temp;
+			}
+		}
 	}
-	fclose(f);
-	fclose(f2);
-	remove(temp_file_path);
-	printf("Операція успішно виконана!\n");
-
-
-
 }
 int main()
 {
+
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
-	const int N = 1000;
-	char file1_path[N], file2_path[N], file3_path[N];
-	cin.getline(file1_path, N); //введіть шлях до file1
-	cin.getline(file2_path, N);//введіть шлях до file2
-	cin.getline(file3_path, N);//введіть шлях до file3
-	FILE* f = fopen(file1_path, "r");
-	FILE* f2 = fopen(file2_path, "w");
-	FILE* f3 = fopen(file3_path, "r");
-	
-	char inputword[1000];
-	char find_word[1000];
-	char new_word[1000];
+	/*contact example;
+	example.fill();
+	example.read_info();*/
+	contact* list = nullptr;
+	int count = 0;
+	int exit = 0;
+	char select[50];
+	printf("Вас вітає меню керування контактами!\nось наявні команди:\n/see_list - вивести весь список контактів\n/new_contact - додати контакт\n/sort_name - сортувати список за ім'ям\n/sort_fax - сортувати список за телефоном\n");
+	printf("/exit- вийти з программи\n");
+	while (exit == 0)
+	{
 
-	cin.getline(inputword, 1000);
-	task1(f, f2, N);
-	rewind(f);
+		cin.getline(select, 50);
+		if (strcmp(select, "/exit") == 0)
+		{
+			exit = 1;
+			printf("До зустрічі!\n");
+		}
+		else if (list != nullptr)
+		{
+			if (strcmp(select, "/see_list") == 0)
+			{
+				for (int i = 0; i < count; i++)
+				{
+					printf("------------------------------\n");
+					list[i].read_info();
+					printf("------------------------------\n");
+				}
+			}
+			else if (strcmp(select, "/new_contact") == 0)
+			{
+				new_contact(list, count);
 
-	task2(f, N);
-	rewind(f);
-	task3(f, N, inputword);
-	fclose(f);
-	fclose(f2);
-	cin.getline(find_word, N);
-	cin.getline(new_word, N);
-	task4(f3, file3_path, N, find_word, new_word);
+				printf("контакт успішно доданий!\n");
+			}
+			else if (strcmp(select, "/sort_name") == 0)
+			{
+				sort_name(list, count);
+				printf("Список успішно відсортовано!\n");
+			}
+			else if (strcmp(select, "/sort_fax") == 0)
+			{
+				sort_fax(list, count);
+				printf("Список успішно відсортовано!\n");
+			}
+
+
+			else
+			{
+				printf("Ви ввели щось не зрозуміле..Спробуйте ще раз\n");
+			}
+		}
+		else {
+			if (strcmp(select, "/exit") == 0)
+			{
+				exit = 1;
+				printf("До зустрічі!\n");
+			}
+			else if (strcmp(select, "/see_list") == 0 || strcmp(select, "/sort_name") == 0 || strcmp(select, "/sort_fax") == 0)
+			{
+				printf("У вас немає наявних контактів:додайте нові контакти\n");
+			}
+			else if (strcmp(select, "/new_contact") == 0)
+			{
+				new_contact(list, count);
+				printf("контакт успішно доданий!\n");
+			}
+
+			else
+			{
+				printf("Ви ввели щось не зрозуміле..Спробуйте ще раз\n");
+			}
+		}
+	}
+	if (list != nullptr)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			delete[] list[i].name;
+		}
+		delete[] list;
+	}
+
+
+
 	return 0;
 }
